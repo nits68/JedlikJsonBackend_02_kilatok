@@ -3,7 +3,7 @@
       "sourceMap": true,
       "target": "esnext",
       "module": "CommonJS",
-      "outDir": "./dist",
+      "outDir": "./backend",
       "baseUrl": "./src",
       "alwaysStrict": true,
       "noImplicitAny": false,
@@ -32,6 +32,6 @@
     ],
     "exclude": [
       "node_modules",
-      "dist"
+      "backend"
     ]
   }

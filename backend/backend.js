@@ -5,15 +5,22 @@ const express_1 = tslib_1.__importDefault(require("express"));
 const cors_1 = tslib_1.__importDefault(require("cors"));
 const fs_1 = require("fs");
 const morgan_1 = tslib_1.__importDefault(require("morgan"));
+const swagger_ui_express_1 = tslib_1.__importDefault(require("swagger-ui-express"));
+const swagger_output_json_1 = tslib_1.__importDefault(require("../backend/swagger-output.json"));
 const app = (0, express_1.default)();
 const PORT = 3000;
 // Middleware to parse request body
 app.use(express_1.default.json());
+// Add Swagger UI to the app
+const options = { swaggerOptions: { tryItOutEnabled: true } };
+app.use("/docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_output_json_1.default, options));
 // Enabled CORS (Cross-Origin Resource Sharing):
 app.use((0, cors_1.default)());
 // Logger middleware: log all requests to the console
 app.use((0, morgan_1.default)("dev"));
 app.get("/api/viewpoints", async (req, res) => {
+    // #swagger.tags = ['Viewpoints']
+    // #swagger.summary = 'Az összes kilátó kivonatolt adatainak lekérdezése'
     const data = await readDataFromFile("viewpoints");
     if (data) {
         res.send(data
@@ -30,9 +37,11 @@ app.get("/api/viewpoints", async (req, res) => {
         res.status(404).send({ message: "Error while reading data." });
     }
 });
-// Read and create limited journey data
 app.get("/api/:locationName/viewpoints", async (req, res) => {
     try {
+        // #swagger.tags = ['Viewpoints']
+        // #swagger.summary = 'A megadott hegység kilátóit kérdezi le'
+        // #swagger.parameters['locationName'] = { example: 'Bükk'}
         const locations = await readDataFromFile("locations");
         const location = locations.find(e => e.locationName === req.params.locationName);
         if (location) {
@@ -48,8 +57,9 @@ app.get("/api/:locationName/viewpoints", async (req, res) => {
         res.status(400).send({ message: error.message });
     }
 });
-// Read and create limited journey data
 app.get("/api/locations", async (req, res) => {
+    // #swagger.tags = ['Locations']
+    // #swagger.summary = 'Hegységek lekérdezése'
     try {
         const locations = await readDataFromFile("locations");
         if (locations) {
@@ -63,8 +73,32 @@ app.get("/api/locations", async (req, res) => {
         res.status(400).send({ message: error.message });
     }
 });
-// POST operation to create a new journey
 app.post("/api/rate", async (req, res) => {
+    // #swagger.tags = ['Rates']
+    // #swagger.summary = 'Kilátóról értékelés készítése'
+    /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            viewpointId: { type: "number" },
+                            rating: { type: "number" },
+                            email: { type: "string" },
+                            comment: { type: "string" }
+                        },
+                        example: {
+                            viewpointId: 15,
+                            rating: 8,
+                            email: "kiss.dora@mail.hu",
+                            comment: "Nagyon szép kilátás!"
+                        }
+                    }
+                }
+            }
+        }
+    */
     try {
         const newRate = req.body;
         if (!newRate.viewpointId || !newRate.rating || !newRate.email) {
@@ -131,7 +165,7 @@ app.post("/api/rate", async (req, res) => {
 //     }
 // });
 app.listen(PORT, () => {
-    console.log(`Jedlik Json-Backend-Server listening on port ${PORT}`);
+    console.log(`Jedlik Json-Backend-Server Swagger: http://localhost:${PORT}/docs`);
 });
 // Utility functions to read/write data from/to file
 async function readDataFromFile(table) {

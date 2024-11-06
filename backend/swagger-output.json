@@ -1,0 +1,137 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Jedlik REST API Server for 'Viewpoints'",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": ""
+    }
+  ],
+  "tags": [
+    {
+      "name": "",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/api/viewpoints": {
+      "get": {
+        "tags": [
+          "Viewpoints"
+        ],
+        "summary": "Az összes kilátó kivonatolt adatainak lekérdezése",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/{locationName}/viewpoints": {
+      "get": {
+        "tags": [
+          "Viewpoints"
+        ],
+        "summary": "A megadott hegység kilátóit kérdezi le",
+        "description": "",
+        "parameters": [
+          {
+            "name": "locationName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Bükk"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/locations": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "Hegységek lekérdezése",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/rate": {
+      "post": {
+        "tags": [
+          "Rates"
+        ],
+        "summary": "Kilátóról értékelés készítése",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "viewpointId": {
+                    "type": "number"
+                  },
+                  "rating": {
+                    "type": "number"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "comment": {
+                    "type": "string"
+                  }
+                },
+                "example": {
+                  "viewpointId": 15,
+                  "rating": 8,
+                  "email": "kiss.dora@mail.hu",
+                  "comment": "Nagyon szép kilátás!"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

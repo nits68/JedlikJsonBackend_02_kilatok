@@ -6,5 +6,5 @@
     "watch": ["favicon.ico", "src/"],
     "ext": "ts, js, txt, json, ico",
     "delay": 0,
-    "exec": "./node_modules/.bin/tsc && node --inspect ./dist/backend.js  || exit 1"
+    "exec": "./node_modules/.bin/tsc && node --inspect ./backend/backend.js  || exit 1"
 }

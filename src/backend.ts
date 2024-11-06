@@ -2,12 +2,18 @@
 import cors from "cors";
 import { promises as fs } from "fs";
 import morgan from "morgan";
+import swaggerUi, { SwaggerUiOptions } from "swagger-ui-express";
+import swaggerDocument from "../backend/swagger-output.json";
 
 const app = express();
 const PORT = 3000;
 
 // Middleware to parse request body
 app.use(express.json());
+
+// Add Swagger UI to the app
+const options: SwaggerUiOptions = { swaggerOptions: { tryItOutEnabled: true } };
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 // Enabled CORS (Cross-Origin Resource Sharing):
 app.use(cors());
@@ -16,6 +22,8 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.get("/api/viewpoints", async (req: Request, res: Response) => {
+    // #swagger.tags = ['Viewpoints']
+    // #swagger.summary = 'Az összes kilátó kivonatolt adatainak lekérdezése'
     const data = await readDataFromFile("viewpoints");
     if (data) {
         res.send(
@@ -34,9 +42,12 @@ app.get("/api/viewpoints", async (req: Request, res: Response) => {
     }
 });
 
-// Read and create limited journey data
 app.get("/api/:locationName/viewpoints", async (req: Request, res: Response) => {
     try {
+        // #swagger.tags = ['Viewpoints']
+        // #swagger.summary = 'A megadott hegység kilátóit kérdezi le'
+        // #swagger.parameters['locationName'] = { example: 'Bükk'}
+
         const locations = await readDataFromFile("locations");
         const location = locations.find(e => e.locationName === req.params.locationName);
         if (location) {
@@ -51,8 +62,9 @@ app.get("/api/:locationName/viewpoints", async (req: Request, res: Response) => 
     }
 });
 
-// Read and create limited journey data
 app.get("/api/locations", async (req: Request, res: Response) => {
+    // #swagger.tags = ['Locations']
+    // #swagger.summary = 'Hegységek lekérdezése'
     try {
         const locations = await readDataFromFile("locations");
         if (locations) {
@@ -65,8 +77,32 @@ app.get("/api/locations", async (req: Request, res: Response) => {
     }
 });
 
-// POST operation to create a new journey
 app.post("/api/rate", async (req: Request, res: Response) => {
+    // #swagger.tags = ['Rates']
+    // #swagger.summary = 'Kilátóról értékelés készítése'
+    /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            viewpointId: { type: "number" },
+                            rating: { type: "number" },
+                            email: { type: "string" },
+                            comment: { type: "string" }
+                        },
+                        example: {
+                            viewpointId: 15,
+                            rating: 8,
+                            email: "kiss.dora@mail.hu",
+                            comment: "Nagyon szép kilátás!"
+                        }
+                    }  
+                }
+            }
+        } 
+    */
     try {
         const newRate: any = req.body;
         if (!newRate.viewpointId || !newRate.rating || !newRate.email) {
@@ -135,7 +171,7 @@ app.post("/api/rate", async (req: Request, res: Response) => {
 // });
 
 app.listen(PORT, () => {
-    console.log(`Jedlik Json-Backend-Server listening on port ${PORT}`);
+    console.log(`Jedlik Json-Backend-Server Swagger: http://localhost:${PORT}/docs`);
 });
 
 // Utility functions to read/write data from/to file
