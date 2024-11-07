@@ -109,10 +109,14 @@ app.post("/api/rate", async (req: Request, res: Response) => {
     */
     try {
         const newRate: any = req.body;
-        if (Object.keys(newRate).length != 4 || !newRate.viewpointId || !newRate.rating || !newRate.email || !newRate.comment) throw new Error("Validation failed: A kérés mezői nem megfelelők.");
+        if (Object.keys(newRate).length != 4 || !newRate.viewpointId || !newRate.rating || !newRate.email || !newRate.comment) throw new Error("Validation failed: A kérés mezői nem megfelelők, vagy nem tartalmaznak értéket!");
 
         if (newRate.rating < 1 || newRate.rating > 10) {
-            throw new Error("Validation failed: az értékelésnek 1-10 közötti értéknek kell lennie.");
+            throw new Error("Validation failed: Az értékelésnek 1-10 közötti értéknek kell lennie!");
+        }
+
+        if (!newRate.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
+            throw new Error("Validation failed: Kérem adja meg helyesen az email címét!");
         }
 
         const rates = await readDataFromFile("rates");
