@@ -5,7 +5,7 @@ const swagger_autogen_1 = tslib_1.__importDefault(require("swagger-autogen"));
 const doc = {
     info: {
         version: "1.0.0", // by default: '1.0.0'
-        title: "Jedlik REST API Server for 'Viewpoints'", // by default: 'REST API'
+        title: "Jedlik REST API Server for 'Kilátók'", // by default: 'REST API'
         description: "", // by default: ''
     },
     servers: [

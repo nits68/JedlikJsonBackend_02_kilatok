@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "version": "1.0.0",
-    "title": "Jedlik REST API Server for 'Viewpoints'",
+    "title": "Jedlik REST API Server for 'Kilátók'",
     "description": ""
   },
   "servers": [
@@ -28,6 +28,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "404": {
             "description": "Not Found"

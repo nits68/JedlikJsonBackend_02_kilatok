@@ -21,20 +21,25 @@ app.use((0, morgan_1.default)("dev"));
 app.get("/api/viewpoints", async (req, res) => {
     // #swagger.tags = ['Viewpoints']
     // #swagger.summary = 'Az összes kilátó kivonatolt adatainak lekérdezése'
-    const data = await readDataFromFile("viewpoints");
-    if (data) {
-        res.send(data
-            .map((v) => {
-            return {
-                id: v.id,
-                viewpointName: v.viewpointName,
-                mountain: v.mountain,
-            };
-        })
-            .sort((a, b) => a.id - b.id));
+    try {
+        const data = await readDataFromFile("viewpoints");
+        if (data) {
+            res.send(data
+                .map((v) => {
+                return {
+                    id: v.id,
+                    viewpointName: v.viewpointName,
+                    mountain: v.mountain,
+                };
+            })
+                .sort((a, b) => a.id - b.id));
+        }
+        else {
+            res.status(404).send({ message: "Error while reading data." });
+        }
     }
-    else {
-        res.status(404).send({ message: "Error while reading data." });
+    catch (error) {
+        res.status(400).send({ message: error.message });
     }
 });
 app.get("/api/:locationName/viewpoints", async (req, res) => {
@@ -101,9 +106,8 @@ app.post("/api/rate", async (req, res) => {
     */
     try {
         const newRate = req.body;
-        if (!newRate.viewpointId || !newRate.rating || !newRate.email) {
-            throw new Error("Validation failed: hiányzó adatok.");
-        }
+        if (Object.keys(newRate).length != 4 || !newRate.viewpointId || !newRate.rating || !newRate.email || !newRate.comment)
+            throw new Error("Validation failed: A kérés mezői nem megfelelők.");
         if (newRate.rating < 1 || newRate.rating > 10) {
             throw new Error("Validation failed: az értékelésnek 1-10 közötti értéknek kell lennie.");
         }
@@ -174,8 +178,7 @@ async function readDataFromFile(table) {
         return JSON.parse(data);
     }
     catch (error) {
-        console.error(error);
-        return [];
+        return [error.message];
     }
 }
 async function saveDataToFile(table, data) {

@@ -24,21 +24,25 @@ app.use(morgan("dev"));
 app.get("/api/viewpoints", async (req: Request, res: Response) => {
     // #swagger.tags = ['Viewpoints']
     // #swagger.summary = 'Az összes kilátó kivonatolt adatainak lekérdezése'
-    const data = await readDataFromFile("viewpoints");
-    if (data) {
-        res.send(
-            data
-                .map((v: any) => {
-                    return {
-                        id: v.id,
-                        viewpointName: v.viewpointName,
-                        mountain: v.mountain,
-                    };
-                })
-                .sort((a: any, b: any) => a.id - b.id),
-        );
-    } else {
-        res.status(404).send({ message: "Error while reading data." });
+    try {
+        const data = await readDataFromFile("viewpoints");
+        if (data) {
+            res.send(
+                data
+                    .map((v: any) => {
+                        return {
+                            id: v.id,
+                            viewpointName: v.viewpointName,
+                            mountain: v.mountain,
+                        };
+                    })
+                    .sort((a: any, b: any) => a.id - b.id),
+            );
+        } else {
+            res.status(404).send({ message: "Error while reading data." });
+        }
+    } catch (error) {
+        res.status(400).send({ message: error.message });
     }
 });
 
@@ -105,12 +109,12 @@ app.post("/api/rate", async (req: Request, res: Response) => {
     */
     try {
         const newRate: any = req.body;
-        if (!newRate.viewpointId || !newRate.rating || !newRate.email) {
-            throw new Error("Validation failed: hiányzó adatok.");
-        }
+        if (Object.keys(newRate).length != 4 || !newRate.viewpointId || !newRate.rating || !newRate.email || !newRate.comment) throw new Error("Validation failed: A kérés mezői nem megfelelők.");
+
         if (newRate.rating < 1 || newRate.rating > 10) {
             throw new Error("Validation failed: az értékelésnek 1-10 közötti értéknek kell lennie.");
         }
+
         const rates = await readDataFromFile("rates");
         const alreadyRated = rates.find(e => e.viewpointId === newRate.viewpointId && e.email === newRate.email);
         if (alreadyRated) {
@@ -180,8 +184,7 @@ async function readDataFromFile(table: string): Promise<any[]> {
         const data = await fs.readFile(`db_${table}.json`, "utf8");
         return JSON.parse(data);
     } catch (error) {
-        console.error(error);
-        return [];
+        return [error.message];
     }
 }
 
