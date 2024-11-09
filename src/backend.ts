@@ -39,7 +39,7 @@ app.get("/api/viewpoints", async (req: Request, res: Response) => {
                     .sort((a: any, b: any) => a.id - b.id),
             );
         } else {
-            res.status(404).send({ message: "Error while reading data." });
+            res.status(404).send({ message: "Hiba az adatok olvasásakor!" });
         }
     } catch (error) {
         res.status(400).send({ message: error.message });

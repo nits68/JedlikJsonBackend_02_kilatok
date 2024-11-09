@@ -35,7 +35,7 @@ app.get("/api/viewpoints", async (req, res) => {
                 .sort((a, b) => a.id - b.id));
         }
         else {
-            res.status(404).send({ message: "Error while reading data." });
+            res.status(404).send({ message: "Hiba az adatok olvasásakor!" });
         }
     }
     catch (error) {
@@ -107,19 +107,19 @@ app.post("/api/rate", async (req, res) => {
     try {
         const newRate = req.body;
         if (Object.keys(newRate).length != 4 || !newRate.viewpointId || !newRate.rating || !newRate.email || !newRate.comment)
-            throw new Error("Validation failed: A kérés mezői nem megfelelők, vagy nem tartalmaznak értéket!");
+            throw new Error("A kérés mezői nem megfelelők, vagy nem tartalmaznak értéket!");
         if (newRate.rating < 1 || newRate.rating > 10) {
-            throw new Error("Validation failed: Az értékelésnek 1-10 közötti értéknek kell lennie!");
+            throw new Error("Az értékelésnek 1-10 közötti értéknek kell lennie!");
         }
         if (!newRate.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-            throw new Error("Validation failed: Kérem adja meg helyesen az email címét!");
+            throw new Error("Kérem adja meg helyesen az email címét!");
         }
         const rates = await readDataFromFile("rates");
         const alreadyRated = rates.find(e => e.viewpointId === newRate.viewpointId && e.email === newRate.email);
         if (alreadyRated) {
-            throw new Error("Validation failed: ezzel az e-mailcímmel ezt a kilátót már értékelték.");
+            throw new Error("Ezzel az e-mailcímmel ezt a kilátót már értékelték.");
         }
-        newRate.id = rates.length + 1;
+        newRate.id = Math.max(...rates.map(e => e.id)) + 1;
         rates.push(newRate);
         const response = await saveDataToFile("rates", rates);
         if (response == "OK") {
