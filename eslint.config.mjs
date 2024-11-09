@@ -40,6 +40,9 @@ export default [
             // "unicode-bom": ["error", "never"],
             // "arrow-parens": ["error", "as-needed"],
         },
+        ignoresOptions: {
+            ignorePatterns: ["**/*.js", "**/*.mjs"],
+        },
     },
     {
         files: ["**/__tests__/*.{j,t}s?(x)", "**/tests/unit/**/*.spec.{j,t}s?(x)"],
